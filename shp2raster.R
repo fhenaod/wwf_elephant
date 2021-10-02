@@ -16,7 +16,7 @@ plot(empty_raster)
 fence_raster <- buffer(fence_sh, width = .1) %>% 
   rasterize(., empty_raster, field = 0, background = 1)
 
-plot(fence_raster, add = T)
+plot(fence_raster)
 fence_sh %>% plot(add = T)
 scalebar(100, type = "bar", divs = 4)
 
@@ -30,7 +30,7 @@ roads_sh %>% plot()
 road_raster <- buffer(roads_sh, width = .1) %>% 
   rasterize(., empty_raster, field = 0, background = 1)
 plot(road_raster)
-roads_sh %>% plot(add = T)
+roads_sh %>% plot(add = T, col = "red" )
 
 writeRaster(road_raster, filename = "data/road_raster.tif")
 
@@ -44,9 +44,10 @@ plot(rworldmap::countriesLow, add = T, lty = 2)
 # BioClim ####
 bc_data <- getData("worldclim", var = "bio", res = 0.5, lon = 22, lat = -18.5)
 bc_data_crop <- crop(bc_data, extent(ld_cov_crop))
-plot(bc_data_crop$bio)
 
-writeRaster(bc_data_crop, filename = "data/bioclim_rasters.tif")
+writeRaster(bc_data_crop, 
+            filename = "data/bioclim_rasters.tif", format = "GTiff",
+            options = c("INTERLEAVE=BAND","COMPRESS=LZW"), overwrite = T)
 
 # MODIS rasters ####
 library(MODIStsp)
@@ -73,5 +74,3 @@ MODIStsp(
 ndvi_15 <- raster("data/merged_fences_old and 2021 AA5FEB2021/VI_16Days_1Km_v6/NDVI/MOD13A2_NDVI_2020_161.tif")
 ndvi_15_rp <- projectRaster(ndvi_15, crs = crs(bc_data_crop))
 plot(ndvi_15_rp)
-
-
